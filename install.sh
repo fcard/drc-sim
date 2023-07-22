@@ -24,9 +24,9 @@
 #    Migrate to pkexec from gksu
 
 VERSION="1.2"
-REPO_DRC_SIM="https://github.com/rolandoislas/drc-sim.git"
+REPO_DRC_SIM="https://github.com/fcard/drc-sim.git"
 REPO_WPA_SUPPLICANT_DRC="https://github.com/rolandoislas/drc-hostap.git"
-REPO_DRC_SIM_C="https://github.com/rolandoislas/drc-sim-c.git"
+REPO_DRC_SIM_C="https://github.com/fcard/drc-sim-c.git"
 INSTALL_DIR="/opt/drc_sim/"
 dependencies=()
 branch_drc_sim=""
@@ -105,12 +105,20 @@ update_git() {
     return 0
 }
 
+phi_checkout() {
+  local old_pwd="$PWD"
+  cd "${INSTALL_DIR}${1}"
+  git checkout develop-phi &> /dev/null
+  cd "${old_pwd}"
+}
+
 # Clones a git repo to the install path
 # If the directory exists it is removed
 # Param $1: git repo url
 get_git() {
     git_dir="${INSTALL_DIR}${2}"
     if update_git ${git_dir}; then
+        phi_checkout "${2}"
         return 0
     else
         # Remove directory for a clean clone
@@ -118,10 +126,12 @@ get_git() {
             rm -rf "${git_dir}"
         fi
     fi
+
     # Clone
     echo "Cloning ${1} into ${git_dir}"
     if command git clone ${1} ${git_dir} &> /dev/null; then
         echo "Cloned ${1}"
+        phi_checkout "${2}"
     else
         echo "Failed to clone ${1}"
         exit 1
