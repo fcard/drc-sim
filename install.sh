@@ -281,24 +281,28 @@ uninstall() {
 
 # Parses args
 check_args() {
-    branch_drc_sim=${1:-master}
+    branch_drc_sim=${1:-develop-phi}
     # Help
     if [[ "${1}" == "help" ]] || [[ "${1}" == "-h" ]]; then
         echo "Usage: <install.sh> [argument]"
         echo "  Defaults to install."
         echo "  Arguments:"
         echo "    -h, help : help menu"
-        echo "    branch : branch to use for drc-sim (master, develop, local) master is used by default"
+        echo "    branch : branch to use for drc-sim (main, develop-phi, develop, local) develop-phi is used by default"
         echo "    uninstall : uninstall DRC Sim"
         exit 1
     # Uninstall
     elif [[ "${1}" == "uninstall" ]]; then
         uninstall
     # Install branch
-    elif [[ "${branch_drc_sim}" != "develop" ]] && [[ "${branch_drc_sim}" != "master" ]] && 
-         [[ "${branch_drc_sim}" != "local" ]]; then
-        echo "Invalid branch \"${1}\""
-        check_args "help"
+    else
+        case "${branch_drc_sim}" in
+            main|develop|develop-phi|local) ;;
+            *)
+                echo "Invalid branch \"${1}\""
+                check_args "help"
+            ;;
+        esac
     fi
 }
 
